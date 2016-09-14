@@ -2,12 +2,27 @@
   "autoload": {
     "psr-4": {
       "Google\\Cloud\\Samples\\Pubsub\\": "src"
-    }
+    },
+    "files": [
+      "src/functions/create_pubsub_client.php",
+      "src/functions/create_subscription.php",
+      "src/functions/create_topic.php",
+      "src/functions/create_push_subscription.php",
+      "src/functions/get_subscription_policy.php",
+      "src/functions/get_topic_policy.php ",
+      "src/functions/list_subscriptions.php",
+      "src/functions/list_topics.php",
+      "src/functions/publish_messages.php",
+      "src/functions/pull_message.php",
+      "src/functions/set_subscription_policy.php",
+      "src/functions/set_topic_policy.php",
+      "src/functions/test_subscription_permissions.php",
+      "src/functions/test_topic_permissions.php"
+    ]
   },
   "require": {
     "php": ">=5.4",
-    "silex/silex": "~1.3",
-    "google/apiclient": "^2.0",
+    "google/cloud": "0.8",
     "symfony/twig-bridge": "~2.7|3.0.*",
     "twig/twig": "~1.8|~2.0"
   },
