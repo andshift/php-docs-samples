@@ -31,11 +31,20 @@ TODO(tmatsuo): Better implementation for devserver.
   [Cloud SDK](https://developers.google.com/cloud/sdk/) rather than
   just installing App Engine SDK.
 
-- Install Google API client library for PHP into 'lib' directory by running:
+- Install dependencies by running:
 
 ```
 $ composer install
 ```
+
+## Run the app locally
+
+```
+$ php -S localhost:8080 -t web
+```
+
+Now browse to [localhost:8080](http://localhost:8080) in your browser.
+
 
 ## Deploy the application to App Engine
 
