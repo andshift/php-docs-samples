@@ -17,6 +17,7 @@ pubsub.PubsubController = function($http, $log, $timeout) {
   this.isAutoUpdating = true;
   this.failCount = 0;
   this.hasAttemptedToCreateTopicAndSubscription = false;
+  this.messages = [];
   this.fetchMessages();
 };
 
@@ -80,7 +81,7 @@ pubsub.PubsubController.prototype.fetchMessages = function() {
   var self = this;
   self.http.get('/fetch_messages')
     .success(function(data, status) {
-      self.messages = data;
+      self.messages.push.apply(self.messages, data);
       self.failCount = 0;
     })
     .error(function(data, status) {

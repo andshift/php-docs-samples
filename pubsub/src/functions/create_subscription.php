@@ -35,5 +35,14 @@ use Google\Cloud\ServiceBuilder;
  */
 function create_subscription($projectId, $topicName, $subscriptionName)
 {
+    $builder = new ServiceBuilder([
+        'projectId' => $projectId,
+    ]);
+    $pubsub = $builder->pubsub();
+    $topic = $pubsub->topic($topicName);
+    $subscription = $topic->subscription($subscriptionName);
+    $subscription->create();
+
+    printf('Subscription created: %s' . PHP_EOL, $subscription->name());
 }
 # [END create_subscription]

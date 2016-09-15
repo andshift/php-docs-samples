@@ -34,5 +34,18 @@ use Google\Cloud\ServiceBuilder;
  */
 function test_topic_permissions($projectId, $topicName)
 {
+    $builder = new ServiceBuilder([
+        'projectId' => $projectId,
+    ]);
+    $pubsub = $builder->pubsub();
+    $topic = $pubsub->topic($topicName);
+    $permissions = $topic->iam()->testPermissions([
+        'pubsub.topics.attachSubscription',
+        'pubsub.topics.publish',
+        'pubsub.topics.update'
+    ]);
+    foreach ($permissions['permissions'] as $permission) {
+        printf('Permission: %s' . PHP_EOL, $permission);
+    }
 }
 # [END test_topic_permissions]

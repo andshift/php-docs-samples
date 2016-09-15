@@ -15,30 +15,22 @@
  * limitations under the License.
  */
 
-/**
- * For instructions on how to run the full sample:
- *
- * @see https://github.com/GoogleCloudPlatform/php-docs-samples/tree/master/pubsub/README.md
- */
-
 namespace Google\Cloud\Samples\Pubsub;
 
-# [START list_subscriptions]
-use Google\Cloud\ServiceBuilder;
-
 /**
- * Lists all Pub/Sub subscriptions.
- *
- * @param string $projectId  The Google project ID.
+ * Trait for determining the current project ID using "gcloud"
  */
-function list_subscriptions($projectId)
+trait ProjectIdTrait
 {
-    $builder = new ServiceBuilder([
-        'projectId' => $projectId,
-    ]);
-    $pubsub = $builder->pubsub();
-    foreach ($pubsub->subscriptions() as $subscription) {
-        printf('Subscription: %s' . PHP_EOL, $subscription->name());
+    private function getProjectIdFromGcloud()
+    {
+        exec("gcloud config list --format 'value(core.project)' 2>/dev/null", $output, $return_var);
+
+        if (0 === $return_var) {
+            return array_pop($output);
+        }
+
+        throw new Exception('Could not derive a project ID from gcloud. ' .
+            'You must supply a project ID using --project');
     }
 }
-# [END list_subscriptions]

@@ -23,22 +23,24 @@
 
 namespace Google\Cloud\Samples\Pubsub;
 
-# [START list_subscriptions]
+# [START delete_subscription]
 use Google\Cloud\ServiceBuilder;
 
 /**
- * Lists all Pub/Sub subscriptions.
+ * Creates a Pub/Sub subscription.
  *
  * @param string $projectId  The Google project ID.
+ * @param string $subscriptionName  The Pub/Sub subscription name.
  */
-function list_subscriptions($projectId)
+function delete_subscription($projectId, $subscriptionName)
 {
     $builder = new ServiceBuilder([
         'projectId' => $projectId,
     ]);
     $pubsub = $builder->pubsub();
-    foreach ($pubsub->subscriptions() as $subscription) {
-        printf('Subscription: %s' . PHP_EOL, $subscription->name());
-    }
+    $subscription = $pubsub->subscription($subscriptionName);
+    $subscription->delete();
+
+    printf('Subscription deleted: %s' . PHP_EOL, $subscription->name());
 }
-# [END list_subscriptions]
+# [END delete_subscription]

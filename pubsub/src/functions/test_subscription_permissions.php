@@ -34,5 +34,17 @@ use Google\Cloud\ServiceBuilder;
  */
 function test_subscription_permissions($projectId, $subscriptionName)
 {
+    $builder = new ServiceBuilder([
+        'projectId' => $projectId,
+    ]);
+    $pubsub = $builder->pubsub();
+    $subscription = $pubsub->subscription($subscriptionName);
+    $permissions = $subscription->iam()->testPermissions([
+        'pubsub.subscriptions.consume',
+        'pubsub.subscriptions.update'
+    ]);
+    foreach ($permissions['permissions'] as $permission) {
+        printf('Permission: %s' . PHP_EOL, $permission);
+    }
 }
 # [END test_subscription_permissions]

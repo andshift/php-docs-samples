@@ -34,5 +34,12 @@ use Google\Cloud\ServiceBuilder;
  */
 function create_topic($projectId, $topicName)
 {
+    $builder = new ServiceBuilder([
+        'projectId' => $projectId,
+    ]);
+    $pubsub = $builder->pubsub();
+    $topic = $pubsub->createTopic($topicName);
+
+    printf('Topic created: %s' . PHP_EOL, $topic->name());
 }
 # [END create_topic]

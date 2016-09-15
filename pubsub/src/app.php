@@ -15,6 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+namespace Google\Cloud\Samples\Pubsub;
 
 use Silex\Application;
 use Silex\Provider\TwigServiceProvider;
@@ -29,13 +30,14 @@ $app = new Application();
 $app->register(new TwigServiceProvider());
 $app['twig.path'] = [ __DIR__ . '/../templates' ];
 $app['project_id'] = getenv('GOOGLE_PROJECT_NAME');
-$app['topic'] = getenv('TOPIC_NAME') ?: 'php-pubsub-example';
+$app['topic'] = getenv('TOPIC_NAME') ?: 'php-example-topic';
+$app['subscription'] = getenv('SUBSCRIPTION_NAME') ?: 'php-example-subscription';
 
 // Authenticate your API Client
-$client = new Google_Client();
+$client = new \Google_Client();
 $client->useApplicationDefaultCredentials();
-$client->addScope(Google_Service_Pubsub::PUBSUB);
-$client->addScope(Google_Service_Datastore::DATASTORE);
+$client->addScope(\Google_Service_Pubsub::PUBSUB);
+$client->addScope(\Google_Service_Datastore::DATASTORE);
 
 $app['google_client'] = $client;
 
@@ -46,16 +48,7 @@ $app->get('/', function () use ($app) {
 });
 
 $app->get('/fetch_messages', function () use ($app) {
-    /** @var Google_Client $client */
-    $client = $app['google_client'];
-    $projectId = $app['project_id'];
-
-    // Retrieve all messages from datastore
-    // For a more complete demo of datastore,
-    // @see https://github.com/GoogleCloudPlatform/php-docs-samples/tree/master/datastore
-    $datastore = new DatastoreHelper($client, $projectId);
-    $messages = $datastore->fetchMessages();
-
+    $messages = pull_messages($app['project_id'], $app['subscription']);
     return new JsonResponse($messages);
 });
 
@@ -76,72 +69,21 @@ $app->post('/receive_message', function () use ($app) {
     // @see https://github.com/GoogleCloudPlatform/php-docs-samples/tree/master/datastore
     $datastore = new DatastoreHelper($client, $projectId);
     $datastore->storeMessage($message);
-
     return new Response();
 });
 
 $app->post('/send_message', function () use ($app) {
     // send the pubsub message
     if ($messageText = $app['request']->get('message')) {
-        /** @var Google_Client $client */
-        $client = $app['google_client'];
-        $projectName = sprintf('projects/%s', $app['project_id']);
-        $topicName = sprintf('%s/topics/%s', $projectName, $app['topic']);
-
-        $pubsub = new Google_Service_Pubsub($client);
-
-        // create pubsub message object
-        $message = new Google_Service_Pubsub_PubsubMessage();
-        $message->setData(base64_encode($messageText));
-        // create pubsub request
-        $request = new Google_Service_Pubsub_PublishRequest();
-        $request->setMessages([$message]);
-
-        $pubsub->projects_topics->publish($topicName, $request);
-
+        publish_message($app['project_id'], $app['topic'], $messageText);
         return new Response('', 204);
     }
-
     return new Response('', 400);
 });
 
 $app->post('/create_topic_and_subscription', function () use ($app) {
-    /** @var Google_Client $client */
-    $client = $app['google_client'];
-    $projectName = sprintf('projects/%s', $app['project_id']);
-    $pubsub = new Google_Service_Pubsub($client);
-    $topic = new Google_Service_Pubsub_Topic();
-    $topic->setName(sprintf('%s/topics/%s', $projectName, $app['topic']));
-    try {
-        $pubsub->projects_topics->create($topic->getName(), $topic);
-    } catch (Google_Service_Exception $e) {
-        // 409 is ok.  The topic already exists.
-        if ($e->getCode() != 409) {
-            throw $e;
-        }
-    }
-    $subscription = new Google_Service_Pubsub_Subscription();
-    $subscription->setName(sprintf(
-        '%s/subscriptions/%s',
-        $projectName,
-        $app['topic']
-    ));
-    $subscription->setTopic($topic->getName());
-    $config = new Google_Service_Pubsub_PushConfig();
-    $project_id = $app['project_id'];
-    $config->setPushEndpoint("https://$project_id.appspot.com/receive_message");
-    $subscription->setPushConfig($config);
-    try {
-        $pubsub->projects_subscriptions->create(
-            $subscription->getName(),
-            $subscription
-        );
-    } catch (Google_Service_Exception $e) {
-        // 409 is ok.  The subscription already exists.
-        if ($e->getCode() != 409) {
-            throw $e;
-        }
-    }
+    create_topic($app['project_id'], $app['topic']);
+    create_subscription($app['project_id'], $app['topic'], $app['subscription']);
     return 'OK';
 });
 

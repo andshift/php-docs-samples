@@ -34,5 +34,14 @@ use Google\Cloud\ServiceBuilder;
  */
 function pull_messages($projectId, $subscriptionName)
 {
+    $builder = new ServiceBuilder([
+        'projectId' => $projectId,
+    ]);
+    $pubsub = $builder->pubsub();
+    $subscription = $pubsub->subscription($subscriptionName);
+    foreach ($subscription->pull() as $message) {
+        $messageData = $message['message']['data'];
+        printf('Message: %s' . PHP_EOL, base64_decode($messageData));
+    }
 }
 # [END pull_message]

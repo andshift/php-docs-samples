@@ -32,8 +32,18 @@ use Google\Cloud\ServiceBuilder;
  * @param string $projectId  The Google project ID.
  * @param string $topicName  The Pub/Sub topic name.
  * @param string $subscriptionName  The Pub/Sub subscription name.
+ * @param string $endpoint  The endpoint for the push subscription.
  */
-function create_push_subscription($projectId, $topicName, $subscriptionName)
+function create_push_subscription($projectId, $topicName, $subscriptionName, $endpoint)
 {
+    $builder = new ServiceBuilder([
+        'projectId' => $projectId,
+    ]);
+    $pubsub = $builder->pubsub();
+    $topic = $pubsub->topic($topicName);
+    $subscription = $topic->subscription($subscriptionName);
+    $subscription->create([
+        'endpoint' => $endpoint
+    ]);
 }
 # [END create_push_subscription]

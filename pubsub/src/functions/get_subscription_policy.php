@@ -34,5 +34,12 @@ use Google\Cloud\ServiceBuilder;
  */
 function get_subscription_policy($projectId, $subscriptionName)
 {
+    $builder = new ServiceBuilder([
+        'projectId' => $projectId,
+    ]);
+    $pubsub = $builder->pubsub();
+    $subscription = $pubsub->subscription($subscriptionName);
+    $policy = $subscription->iam()->policy();
+    print_r($policy);
 }
 # [END get_subscription_policy]

@@ -27,13 +27,28 @@ namespace Google\Cloud\Samples\Pubsub;
 use Google\Cloud\ServiceBuilder;
 
 /**
- * Adds a service account to the policy for a Pub/Sub topic.
+ * Adds a user to the policy for a Pub/Sub topic.
  *
  * @param string $projectId  The Google project ID.
  * @param string $topicName  The Pub/Sub topic name.
- * @param string $serviceAccountEmail  The service account email to add to the policy.
+ * @param string $userEmail  The user email to add to the policy.
  */
-function set_topic_policy($projectId, $topicName, $serviceAccountEmail)
+function set_topic_policy($projectId, $topicName, $userEmail)
 {
+    $builder = new ServiceBuilder([
+        'projectId' => $projectId,
+    ]);
+    $pubsub = $builder->pubsub();
+    $topic = $pubsub->topic($topicName);
+    $policy = $topic->iam()->policy();
+    $policy['bindings'][] = [
+        'role' => "roles/pubsub.publisher",
+        'members' => [ 'user:' . $userEmail ]
+    ];
+    $topic->iam()->setPolicy($policy);
+
+    printf('User %s added to policy for %s' . PHP_EOL,
+        $userEmail,
+        $topicName);
 }
 # [END set_topic_policy]

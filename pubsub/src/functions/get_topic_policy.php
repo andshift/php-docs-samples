@@ -34,5 +34,12 @@ use Google\Cloud\ServiceBuilder;
  */
 function get_topic_policy($projectId, $topicName)
 {
+    $builder = new ServiceBuilder([
+        'projectId' => $projectId,
+    ]);
+    $pubsub = $builder->pubsub();
+    $topic = $pubsub->topic($topicName);
+    $policy = $topic->iam()->policy();
+    print_r($policy);
 }
 # [END get_topic_policy]

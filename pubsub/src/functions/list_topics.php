@@ -33,5 +33,12 @@ use Google\Cloud\ServiceBuilder;
  */
 function list_topics($projectId)
 {
+    $builder = new ServiceBuilder([
+        'projectId' => $projectId,
+    ]);
+    $pubsub = $builder->pubsub();
+    foreach ($pubsub->topics() as $topic) {
+        printf('Topic: %s' . PHP_EOL, $topic->name());
+    }
 }
 # [END list_topics]

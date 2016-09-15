@@ -35,5 +35,12 @@ use Google\Cloud\ServiceBuilder;
  */
 function publish_message($projectId, $topicName, $message)
 {
+    $builder = new ServiceBuilder([
+        'projectId' => $projectId,
+    ]);
+    $pubsub = $builder->pubsub();
+    $topic = $pubsub->topic($topicName);
+    $topic->publish(['data' => $message]);
+    print('Message published' . PHP_EOL);
 }
 # [END publish_message]
